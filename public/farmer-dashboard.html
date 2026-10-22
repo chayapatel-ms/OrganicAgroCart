@@ -1,0 +1,817 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmer Dashboard | Organic AgroCart</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f4f8ef;
+      color: #263b2a;
+    }
+
+    header {
+      background: #245b35;
+      color: white;
+      padding: 20px 7%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    header h2 {
+      font-size: 23px;
+    }
+
+    header a {
+      color: white;
+      text-decoration: none;
+      margin-left: 16px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 35px auto;
+      padding: 0 20px;
+    }
+
+    .welcome {
+      background: linear-gradient(120deg, #dff1d8, #fffdf2);
+      padding: 28px;
+      border-radius: 18px;
+      margin-bottom: 25px;
+    }
+
+    .welcome h1 {
+      color: #245b35;
+      margin-bottom: 10px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+
+    .stat, .panel {
+      background: white;
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 4px 15px #203b2010;
+    }
+
+    .stat p {
+      color: #647466;
+      margin-bottom: 10px;
+    }
+
+    .stat h2 {
+      color: #28683b;
+      font-size: 30px;
+    }
+
+    .panel {
+      margin-bottom: 25px;
+    }
+
+    .panel h2 {
+      margin-bottom: 20px;
+      color: #245b35;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field h3 {
+      color: #245b35;
+    }
+
+    .muted {
+      color: #647466;
+      line-height: 1.5;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d6dfd2;
+      border-radius: 8px;
+      background: white;
+      font-size: 15px;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    button {
+      background: #28733e;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    button:hover {
+      background: #1c542e;
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .submit-btn {
+      margin-top: 18px;
+    }
+
+    .message {
+      margin-top: 15px;
+      font-weight: bold;
+      overflow-wrap: anywhere;
+    }
+
+    .product-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .product {
+      border: 1px solid #e1e9dc;
+      border-radius: 12px;
+      padding: 18px;
+      overflow-wrap: anywhere;
+    }
+
+    .product .emoji {
+      font-size: 34px;
+    }
+
+    .product h3 {
+      margin: 10px 0;
+    }
+
+    .status {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 6px 10px;
+      border-radius: 20px;
+      background: #fff1cb;
+      color: #805600;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .status.approved, .status.verified {
+      background: #dff5e3;
+      color: #20632f;
+    }
+
+    .status.rejected {
+      background: #ffe1df;
+      color: #9c2828;
+    }
+
+    .empty {
+      color: #647466;
+    }
+
+    @media (max-width: 600px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .field.full {
+        grid-column: auto;
+      }
+
+      header {
+        padding: 18px 5%;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="/agrocart-theme.css">
+</head>
+
+<body>
+  <header>
+    <h2>🌱 Organic AgroCart</h2>
+    <nav>
+      <a href="/">Home</a>
+      <a href="#" id="logoutBtn">Logout</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="welcome">
+      <h1>Welcome, <span id="farmerName">Farmer</span>! 👩‍🌾</h1>
+      <p>Manage your produce and bring fresh farm products directly to customers.</p>
+    </section>
+    
+<!-- Farmer Sales & Earnings Dashboard -->
+<section class="panel">
+  <h2>📊 Sales & Earnings</h2>
+
+  <div class="stats">
+    <div class="stat">
+      <p>Total Sales Value</p>
+      <h2 id="totalSalesValue">₹0.00</h2>
+    </div>
+
+    <div class="stat">
+      <p>Delivered Sales Value</p>
+      <h2 id="deliveredSalesValue">₹0.00</h2>
+    </div>
+
+    <div class="stat">
+      <p>Units Ordered</p>
+      <h2 id="orderedUnits">0</h2>
+    </div>
+
+    <div class="stat">
+      <p>Units Delivered</p>
+      <h2 id="deliveredUnits">0</h2>
+    </div>
+
+    <div class="stat">
+      <p>Orders Containing Your Products</p>
+      <h2 id="salesOrderCount">0</h2>
+    </div>
+
+    <div class="stat">
+      <p>🏆 Best-Selling Product</p>
+      <h2 id="bestSeller" style="font-size: 20px;">—</h2>
+      <p id="bestSellerQuantity">No sales recorded yet</p>
+    </div>
+  </div>
+
+  <p id="salesMessage" class="message" role="status"
+     aria-live="polite">Loading sales information...</p>
+
+  <button type="button" id="refreshSalesBtn">
+    🔄 Refresh Sales
+  </button>
+</section>
+
+
+    <section class="stats">
+      <div class="stat">
+        <p>Total Products</p>
+        <h2 id="totalCount">0</h2>
+      </div>
+
+<div class="form-group">
+  <label for="product-image">Product Image URL</label>
+  <input
+    type="url"
+    id="product-image"
+    name="image"
+    placeholder="https://example.com/tomatoes.jpg"
+  >
+  <small>Enter a direct link to a product photograph.</small>
+</div>
+
+      <div class="stat">
+        <p>Pending Product Approval</p>
+        <h2 id="pendingCount">0</h2>
+      </div>
+
+      <div class="stat">
+        <p>Approved Products</p>
+        <h2 id="approvedCount">0</h2>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>➕ Add a New Product</h2>
+
+      <form id="productForm">
+        <div class="form-grid">
+
+          <div class="field">
+            <label for="name">Product Name</label>
+            <input id="name" required maxlength="100"
+              placeholder="e.g. Fresh Cucumber">
+          </div>
+
+<div class="form-group">
+  <label for="productImage">Product Image URL</label>
+  <input
+    type="url"
+    id="productImage"
+    name="image"
+    placeholder="https://example.com/tomatoes.jpg"
+  >
+  <small>Paste a direct link to a fruit or vegetable photograph.</small>
+</div>
+
+          <div class="field">
+            <label for="category">Category</label>
+            <select id="category" required>
+              <option value="">Choose category</option>
+              <option value="Vegetables">Vegetables</option>
+              <option value="Fruits">Fruits</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="price">Price (₹)</label>
+            <input id="price" type="number" min="0.01"
+              step="0.01" required placeholder="e.g. 30">
+          </div>
+
+          <div class="field">
+            <label for="unit">Unit</label>
+            <select id="unit" required>
+              <option value="kg">Per kg</option>
+              <option value="dozen">Per dozen</option>
+              <option value="piece">Per piece</option>
+              <option value="bunch">Per bunch</option>
+            </select>
+          </div>
+          <div class="field">
+  <label for="stockQuantity">Available Stock *</label>
+  <input
+    type="number"
+    id="stockQuantity"
+    name="stockQuantity"
+    min="0"
+    step="1"
+    placeholder="Enter available quantity"
+    required
+  >
+</div>
+
+          <div class="field">
+            <label for="emoji">Product Emoji</label>
+            <input id="emoji" maxlength="10" placeholder="e.g. 🥒">
+          </div>
+
+          <div class="field">
+            <label for="location">Farm Location</label>
+            <input id="location" required maxlength="100"
+              placeholder="e.g. Hassan, Karnataka">
+          </div>
+
+          <div class="field full">
+            <h3>🌿 Organic Farming &amp; Certification Details</h3>
+            <p class="muted">
+              Enter accurate information about how this crop was grown.
+              An administrator will review organic claims separately.
+            </p>
+          </div>
+
+          <div class="field">
+            <label for="farmingMethod">Farming Method</label>
+            <select id="farmingMethod" required>
+              <option value="">Choose farming method</option>
+              <option value="Organic">Organic</option>
+              <option value="Natural">Natural</option>
+              <option value="Integrated">Integrated farming</option>
+              <option value="Conventional">Conventional</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="chemicalPesticidesUsed">Chemical Pesticides Used?</label>
+            <select id="chemicalPesticidesUsed" required>
+              <option value="Unknown">Not sure / Unknown</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="fertilizerUsed">Fertilizer Used</label>
+            <textarea id="fertilizerUsed" maxlength="500" rows="3"
+              placeholder="Describe fertilizers used"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="pestControlMethod">Pest Control Method</label>
+            <textarea id="pestControlMethod" maxlength="500" rows="3"
+              placeholder="Describe pest control methods"></textarea>
+          </div>
+
+          <div class="field full">
+            <label for="pesticideDetails">Pesticide Details</label>
+            <textarea id="pesticideDetails" maxlength="1000" rows="3"
+              placeholder="List products used, if any"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="harvestDate">Harvest Date</label>
+            <input id="harvestDate" type="date">
+          </div>
+
+          <div class="field">
+            <label for="certificationProvided">Do You Have a Certificate?</label>
+            <select id="certificationProvided" required>
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="certificationName">Certification Name</label>
+            <input id="certificationName" maxlength="200"
+              placeholder="Name of certification or scheme">
+          </div>
+
+          <div class="field">
+            <label for="certificationNumber">Certificate Number</label>
+            <input id="certificationNumber" maxlength="100"
+              placeholder="Certificate number">
+          </div>
+
+          <div class="field">
+            <label for="certificationValidUntil">Certificate Valid Until</label>
+            <input id="certificationValidUntil" type="date">
+          </div>
+
+          <div class="field">
+            <label for="certificateReference">Certificate Evidence Reference</label>
+            <input id="certificateReference" maxlength="500"
+              placeholder="Document name or evidence reference">
+          </div>
+
+          <div class="field full">
+            <label for="farmerNotes">Additional Farming Details</label>
+            <textarea id="farmerNotes" maxlength="1000" rows="3"
+              placeholder="Other details about cultivation"></textarea>
+          </div>
+
+        </div>
+
+        <button class="submit-btn" type="submit">
+          Submit for Verification
+        </button>
+
+        <p id="formMessage" class="message"
+          role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>📦 My Products</h2>
+      <div id="productList" class="product-list">
+        <p class="empty">Loading your products...</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const token = localStorage.getItem("agrocartToken");
+    const savedUser = localStorage.getItem("agrocartUser");
+
+    let currentUser = null;
+
+    try {
+      currentUser = savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      currentUser = null;
+    }
+
+    const form = document.getElementById("productForm");
+    const message = document.getElementById("formMessage");
+    const productList = document.getElementById("productList");
+
+    if (!token || !currentUser || currentUser.role !== "farmer") {
+      document.querySelector(".container").innerHTML =
+        '<section class="panel"><h2>Farmer Login Required</h2>' +
+        '<p>Please log in through the farmer login page to access this dashboard.</p>' +
+        '<p style="margin-top:15px"><a href="/" style="color:#28733e">Return to Home</a></p></section>';
+    } else {
+      document.getElementById("farmerName").textContent =
+  currentUser.name || "Farmer";
+
+loadMyProducts();
+loadSalesSummary();
+
+async function loadSalesSummary() {
+  const salesMessage = document.getElementById("salesMessage");
+  const refreshButton = document.getElementById("refreshSalesBtn");
+
+  salesMessage.textContent = "Loading sales information...";
+  refreshButton.disabled = true;
+
+  try {
+    const response = await fetch("/api/products/sales/summary", {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(
+        data.message || "Unable to load sales information."
+      );
+    }
+
+    const summary = data.summary || {};
+
+    const formatCurrency = value =>
+      "₹" + (Number(value) || 0).toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+    document.getElementById("totalSalesValue").textContent =
+      formatCurrency(summary.totalSalesValue);
+
+    document.getElementById("deliveredSalesValue").textContent =
+      formatCurrency(summary.deliveredSalesValue);
+
+    document.getElementById("orderedUnits").textContent =
+      Number(summary.orderedUnits) || 0;
+
+    document.getElementById("deliveredUnits").textContent =
+      Number(summary.deliveredUnits) || 0;
+
+    document.getElementById("salesOrderCount").textContent =
+      Number(summary.orderCount) || 0;
+
+    const bestSeller = summary.bestSeller;
+
+    if (bestSeller) {
+      document.getElementById("bestSeller").textContent =
+        bestSeller.name || "Unnamed product";
+
+      document.getElementById("bestSellerQuantity").textContent =
+        `${Number(bestSeller.orderedUnits) || 0} ${bestSeller.unit || "units"} ordered`;
+    } else {
+      document.getElementById("bestSeller").textContent = "—";
+
+      document.getElementById("bestSellerQuantity").textContent =
+        "No sales recorded yet";
+    }
+
+    salesMessage.textContent =
+      "✅ Sales information updated successfully.";
+    salesMessage.style.color = "#20632f";
+  } catch (error) {
+    salesMessage.textContent =
+      "❌ " + (error.message || "Unable to load sales information.");
+    salesMessage.style.color = "#a52828";
+  } finally {
+    refreshButton.disabled = false;
+  }
+}
+
+document.getElementById("refreshSalesBtn").addEventListener(
+  "click",
+  loadSalesSummary
+);
+
+    }
+
+    async function loadMyProducts() {
+      try {
+        const response = await fetch("/api/products/mine", {
+          method: "GET",
+          headers: {
+            Authorization: "Bearer " + token
+          }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || "Unable to load products.");
+        }
+
+        const mine = Array.isArray(data.products) ? data.products : [];
+
+        document.getElementById("totalCount").textContent = mine.length;
+
+        document.getElementById("pendingCount").textContent =
+          mine.filter(p => p.verificationStatus === "pending").length;
+
+        document.getElementById("approvedCount").textContent =
+          mine.filter(p => p.verificationStatus === "approved").length;
+
+        if (mine.length === 0) {
+          productList.innerHTML =
+            '<p class="empty">You have not submitted any products yet. Add your first product above!</p>';
+          return;
+        }
+
+        productList.replaceChildren();
+
+        mine.forEach(product => {
+          const card = document.createElement("article");
+          card.className = "product";
+
+          const emoji = document.createElement("div");
+          emoji.className = "emoji";
+          emoji.textContent = product.emoji || "🌱";
+
+          const title = document.createElement("h3");
+          title.textContent = product.name || "Unnamed product";
+
+          
+const price = document.createElement("p");
+price.textContent = "₹" + product.price + " / " + product.unit;
+
+// Display available inventory
+const stock = document.createElement("p");
+stock.style.marginTop = "6px";
+stock.style.fontWeight = "bold";
+
+const quantity = Number(product.stockQuantity ?? 0);
+
+stock.textContent =
+  "📦 Available Stock: " + quantity + " " + product.unit;
+
+if (quantity === 0) {
+  stock.style.color = "#a52828";
+} else if (quantity <= 5) {
+  stock.style.color = "#b7791f";
+} else {
+  stock.style.color = "#20632f";
+}
+
+const location = document.createElement("p");
+
+          location.style.marginTop = "6px";
+          location.textContent = "📍 " + (product.location || "Location not provided");
+
+          const status = document.createElement("span");
+          const verification = product.verificationStatus || "pending";
+          status.className = "status " + verification;
+          status.textContent = "Product approval: " + verification;
+
+          const organicStatus = document.createElement("p");
+          organicStatus.style.marginTop = "8px";
+
+          const organicVerification =
+            product.organicDetails?.organicVerificationStatus || "not_submitted";
+
+          organicStatus.textContent =
+            "Organic review: " + organicVerification.replace(/_/g, " ");
+
+          card.append(
+  emoji,
+  title,
+  price,
+  stock,
+  location,
+  status,
+  organicStatus
+);
+          productList.appendChild(card);
+        });
+      } catch (error) {
+        productList.textContent =
+          error.message || "Unable to load products.";
+      }
+    }
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+
+      if (!token || !currentUser || currentUser.role !== "farmer") {
+        message.textContent = "Please log in as a farmer first.";
+        message.style.color = "#a52828";
+        return;
+      }
+
+      const button = form.querySelector('button[type="submit"]');
+      button.disabled = true;
+      button.textContent = "Submitting...";
+      message.textContent = "";
+
+      const payload = {
+        name: document.getElementById("name").value.trim(),
+        category: document.getElementById("category").value,
+        price: Number(document.getElementById("price").value),
+        unit: document.getElementById("unit").value,
+        stockQuantity: Number(
+  document.getElementById("stockQuantity").value
+),
+        emoji: document.getElementById("emoji").value.trim() || "🌱",
+        image: document.getElementById("productImage").value.trim(),
+        location: document.getElementById("location").value.trim(),
+
+        organicDetails: {
+          farmingMethod:
+            document.getElementById("farmingMethod").value,
+
+          fertilizerUsed:
+            document.getElementById("fertilizerUsed").value.trim(),
+
+          pestControlMethod:
+            document.getElementById("pestControlMethod").value.trim(),
+
+          chemicalPesticidesUsed:
+            document.getElementById("chemicalPesticidesUsed").value,
+
+          pesticideDetails:
+            document.getElementById("pesticideDetails").value.trim(),
+
+          harvestDate:
+            document.getElementById("harvestDate").value || null,
+
+          certificationProvided:
+            document.getElementById("certificationProvided").value === "yes",
+
+          certificationName:
+            document.getElementById("certificationName").value.trim(),
+
+          certificationNumber:
+            document.getElementById("certificationNumber").value.trim(),
+
+          certificationValidUntil:
+            document.getElementById("certificationValidUntil").value || null,
+
+          certificateReference:
+            document.getElementById("certificateReference").value.trim(),
+
+          farmerNotes:
+            document.getElementById("farmerNotes").value.trim()
+        }
+      };
+
+      try {
+        const response = await fetch("/api/products", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token
+          },
+          body: JSON.stringify(payload)
+        });
+
+        let data;
+
+        try {
+          data = await response.json();
+        } catch {
+          throw new Error(
+            "The server returned an invalid response. Check the terminal running npm run dev."
+          );
+        }
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || "Product submission failed.");
+        }
+
+        message.textContent =
+          "✅ Product submitted successfully! It is waiting for admin review.";
+        message.style.color = "#20632f";
+
+        form.reset();
+        await loadMyProducts();
+        
+      } catch (error) {
+        message.textContent =
+          "❌ " + (error.message || "Product submission failed.");
+        message.style.color = "#a52828";
+      } finally {
+        button.disabled = false;
+        button.textContent = "Submit for Verification";
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", event => {
+      event.preventDefault();
+      localStorage.removeItem("agrocartToken");
+      localStorage.removeItem("agrocartUser");
+      window.location.href = "/";
+    });
+  </script>
+</body>
+</html>

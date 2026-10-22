@@ -1,0 +1,665 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organic AgroCart | Admin Dashboard</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7ed;
+      color: #263b2a;
+    }
+
+    header {
+      background: #245b38;
+      color: white;
+      padding: 20px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    header h1 { margin: 0; font-size: 23px; }
+    header a { color: white; text-decoration: none; }
+
+    main {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .intro { margin-bottom: 25px; }
+
+    .panel, .stat, .product {
+      background: white;
+      padding: 22px;
+      border-radius: 14px;
+      box-shadow: 0 3px 12px #0000000d;
+    }
+
+    #loginPanel {
+      max-width: 460px;
+      margin: 35px auto;
+    }
+
+    label {
+      display: block;
+      margin: 14px 0 6px;
+      font-weight: bold;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccd5c9;
+      border-radius: 8px;
+      font: inherit;
+    }
+
+    textarea { resize: vertical; }
+
+    button {
+      padding: 11px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    button:disabled { opacity: .6; cursor: wait; }
+
+    .primary {
+      width: 100%;
+      margin-top: 18px;
+      background: #287341;
+      color: white;
+    }
+
+    .approve { background: #287341; color: white; }
+    .reject { background: #b93636; color: white; }
+    .secondary { background: #e5eee1; color: #245b38; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+      gap: 16px;
+      margin: 25px 0;
+    }
+
+    .stat p { margin-top: 0; color: #657567; }
+    .stat h3 { margin-bottom: 0; font-size: 30px; color: #287341; }
+
+    #message {
+      display: none;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 16px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .section-heading {
+      margin-top: 35px;
+      margin-bottom: 8px;
+    }
+
+    .section-description { color: #657567; }
+
+    .product-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .product h3 { margin: 12px 0; overflow-wrap: anywhere; }
+    .product p { overflow-wrap: anywhere; line-height: 1.5; }
+
+    .status {
+      display: inline-block;
+      background: #fff0c2;
+      color: #795500;
+      border-radius: 20px;
+      padding: 6px 10px;
+      font-size: 12px;
+      margin: 4px 4px 4px 0;
+    }
+
+    .status.approved, .status.verified {
+      background: #dff5e3;
+      color: #20632f;
+    }
+
+    .status.rejected {
+      background: #fde5e3;
+      color: #9b2020;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    .actions button { flex: 1; }
+
+    .review-notes {
+      margin-top: 12px;
+      min-height: 80px;
+    }
+
+    .detail {
+      border-top: 1px solid #e7ece3;
+      padding-top: 9px;
+      margin-top: 9px;
+    }
+
+    .detail strong { color: #245b38; }
+    .empty { background: white; padding: 22px; border-radius: 12px; }
+    [hidden] { display: none !important; }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #68776a;
+    }
+
+    @media (max-width: 500px) {
+      main { padding: 0 12px; }
+      .panel, .product, .stat { padding: 16px; }
+    }
+  </style>
+  <link rel="stylesheet" href="/agrocart-theme.css">
+</head>
+
+<body>
+  <header>
+    <h1>🌱 Organic AgroCart Admin</h1>
+    <nav>
+      <a href="/">Home</a>
+      &nbsp; | &nbsp;
+      <a href="#" id="logout">Logout</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h2>Admin Verification Dashboard</h2>
+      <p>Review products for sale and inspect organic farming claims separately.</p>
+    </section>
+
+    <div id="message" role="status" aria-live="polite"></div>
+
+    <section id="loginPanel" class="panel">
+      <h2>🔐 Admin Login</h2>
+      <p>Sign in using your administrator account.</p>
+
+      <form id="loginForm">
+        <label for="email">Admin email</label>
+        <input id="email" type="email" autocomplete="username"
+          placeholder="Enter admin email" required>
+
+        <label for="password">Admin password</label>
+        <input id="password" type="password"
+          autocomplete="current-password"
+          placeholder="Enter admin password" required>
+
+        <button id="loginButton" class="primary" type="submit">
+          Log In as Admin
+        </button>
+      </form>
+    </section>
+
+    <section id="dashboard" hidden>
+      <div class="stats">
+        <div class="stat">
+          <p>Awaiting Sale Approval</p>
+          <h3 id="salePendingCount">0</h3>
+        </div>
+        <div class="stat">
+          <p>Approved for Sale</p>
+          <h3 id="saleApprovedCount">0</h3>
+        </div>
+        <div class="stat">
+          <p>Awaiting Organic Review</p>
+          <h3 id="organicPendingCount">0</h3>
+        </div>
+        <div class="stat">
+          <p>Organic Claims Verified</p>
+          <h3 id="organicVerifiedCount">0</h3>
+        </div>
+        <div class="stat">
+          <p>Organic Claims Rejected</p>
+          <h3 id="organicRejectedCount">0</h3>
+        </div>
+      </div>
+
+      <section>
+        <h2 class="section-heading">🌿 Organic Verification Queue</h2>
+        <p class="section-description">
+          Inspect the farmer's information and evidence before deciding.
+          Verifying an organic claim does not automatically approve the product for sale.
+        </p>
+        <div id="organicProducts" class="product-list">
+          <div class="empty">Loading organic claims...</div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="section-heading">🛒 Product Sale Approval</h2>
+        <p class="section-description">
+          This separate queue controls whether a product can appear in the public shop.
+        </p>
+        <div id="saleProducts" class="product-list">
+          <div class="empty">Loading products...</div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="section-heading">📋 All Products</h2>
+        <div id="allProducts" class="product-list">
+          <div class="empty">Loading products...</div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer>Organic AgroCart · Admin Portal · Student Project</footer>
+
+  <script>
+    const loginPanel = document.getElementById("loginPanel");
+    const dashboard = document.getElementById("dashboard");
+    const loginForm = document.getElementById("loginForm");
+    const loginButton = document.getElementById("loginButton");
+    const message = document.getElementById("message");
+
+    let token = "";
+    let currentUser = null;
+    let actionInProgress = false;
+
+    function showMessage(text, isError = false) {
+      message.textContent = text;
+      message.style.display = "block";
+      message.style.background = isError ? "#fde8e8" : "#e3f5e7";
+      message.style.color = isError ? "#9b2020" : "#245b38";
+    }
+
+    function hideMessage() {
+      message.textContent = "";
+      message.style.display = "none";
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    function displayDate(value) {
+      if (!value) return "Not provided";
+
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "Invalid date";
+
+      return date.toLocaleDateString();
+    }
+
+    async function api(path, options = {}) {
+      const response = await fetch(path, {
+        ...options,
+        headers: {
+          ...(options.body ? { "Content-Type": "application/json" } : {}),
+          ...(token ? { "Authorization": "Bearer " + token } : {}),
+          ...options.headers
+        }
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.message || `Request failed (${response.status}).`);
+      }
+
+      return data;
+    }
+
+    function setCount(id, value) {
+      document.getElementById(id).textContent = value;
+    }
+
+    async function loadDashboard() {
+      loginPanel.hidden = true;
+      dashboard.hidden = false;
+
+      document.getElementById("organicProducts").innerHTML =
+        '<div class="empty">Loading organic claims...</div>';
+
+      document.getElementById("saleProducts").innerHTML =
+        '<div class="empty">Loading products...</div>';
+
+      document.getElementById("allProducts").innerHTML =
+        '<div class="empty">Loading products...</div>';
+
+      try {
+        const [pendingData, allData] = await Promise.all([
+          api("/api/products/pending"),
+          api("/api/products/admin/all")
+        ]);
+
+        const salePending = pendingData.products || [];
+        const all = allData.products || [];
+
+        const organicPending = all.filter(product =>
+          product.organicDetails?.organicVerificationStatus === "pending"
+        );
+
+        setCount("salePendingCount", salePending.length);
+        setCount("saleApprovedCount",
+          all.filter(p => p.verificationStatus === "approved").length);
+
+        setCount("organicPendingCount", organicPending.length);
+        setCount("organicVerifiedCount", all.filter(p =>
+          p.organicDetails?.organicVerificationStatus === "verified"
+        ).length);
+
+        setCount("organicRejectedCount", all.filter(p =>
+          p.organicDetails?.organicVerificationStatus === "rejected"
+        ).length);
+
+        renderOrganicProducts(organicPending);
+        renderSaleProducts(salePending);
+        renderAllProducts(all);
+      } catch (error) {
+        if (/token|authoriz|unauthorized|forbidden|admin/i.test(error.message)) {
+          token = "";
+          currentUser = null;
+          loginPanel.hidden = false;
+          dashboard.hidden = true;
+          showMessage("Admin session is not valid. Please log in again. " + error.message, true);
+        } else {
+          showMessage("Could not load dashboard: " + error.message, true);
+        }
+      }
+    }
+
+    function renderOrganicProducts(products) {
+      const container = document.getElementById("organicProducts");
+
+      if (!products.length) {
+        container.innerHTML =
+          '<div class="empty">🎉 No organic claims are waiting for review.</div>';
+        return;
+      }
+
+      container.innerHTML = products.map(product => {
+        const details = product.organicDetails || {};
+        const certification = details.certificationProvided
+          ? "Farmer reports a certificate"
+          : "No certificate reported";
+
+        return `
+          <article class="product">
+            <div style="font-size:38px">${escapeHTML(product.emoji || "🌱")}</div>
+            <h3>${escapeHTML(product.name)}</h3>
+            <p><strong>Category:</strong> ${escapeHTML(product.category)}</p>
+            <p><strong>Farmer account ID:</strong> ${escapeHTML(product.farmer)}</p>
+            <p><strong>Farm location:</strong> ${escapeHTML(product.location)}</p>
+            <p><strong>Price:</strong> ₹${escapeHTML(product.price)} / ${escapeHTML(product.unit)}</p>
+
+            <div class="detail">
+              <p><strong>Farming method:</strong> ${escapeHTML(details.farmingMethod || "Not provided")}</p>
+              <p><strong>Fertilizer used:</strong> ${escapeHTML(details.fertilizerUsed || "Not provided")}</p>
+              <p><strong>Pest control:</strong> ${escapeHTML(details.pestControlMethod || "Not provided")}</p>
+              <p><strong>Chemical pesticides used:</strong> ${escapeHTML(details.chemicalPesticidesUsed || "Unknown")}</p>
+              <p><strong>Pesticide details:</strong> ${escapeHTML(details.pesticideDetails || "Not provided")}</p>
+              <p><strong>Harvest date:</strong> ${escapeHTML(displayDate(details.harvestDate))}</p>
+            </div>
+
+            <div class="detail">
+              <p><strong>Certificate:</strong> ${escapeHTML(certification)}</p>
+              <p><strong>Certification name:</strong> ${escapeHTML(details.certificationName || "Not provided")}</p>
+              <p><strong>Certificate number:</strong> ${escapeHTML(details.certificationNumber || "Not provided")}</p>
+              <p><strong>Valid until:</strong> ${escapeHTML(displayDate(details.certificationValidUntil))}</p>
+              <p><strong>Evidence reference:</strong> ${escapeHTML(details.certificateReference || "Not provided")}</p>
+              <p><strong>Farmer notes:</strong> ${escapeHTML(details.farmerNotes || "Not provided")}</p>
+            </div>
+
+            <label for="notes-${escapeHTML(product._id)}">Admin review notes (required)</label>
+            <textarea
+              id="notes-${escapeHTML(product._id)}"
+              class="review-notes"
+              maxlength="1000"
+              placeholder="Explain the evidence reviewed and your decision..."
+              required
+            ></textarea>
+
+            <div class="actions">
+              <button class="approve"
+                data-action="organic"
+                data-id="${escapeHTML(product._id)}"
+                data-status="verified">Verify Organic</button>
+
+              <button class="reject"
+                data-action="organic"
+                data-id="${escapeHTML(product._id)}"
+                data-status="rejected">Reject Claim</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderSaleProducts(products) {
+      const container = document.getElementById("saleProducts");
+
+      if (!products.length) {
+        container.innerHTML =
+          '<div class="empty">No products are waiting for sale approval.</div>';
+        return;
+      }
+
+      container.innerHTML = products.map(product => `
+        <article class="product">
+          <div style="font-size:34px">${escapeHTML(product.emoji || "🌱")}</div>
+          <h3>${escapeHTML(product.name)}</h3>
+          <p><strong>Category:</strong> ${escapeHTML(product.category)}</p>
+          <p><strong>Farmer account ID:</strong> ${escapeHTML(product.farmer)}</p>
+          <p><strong>Location:</strong> ${escapeHTML(product.location)}</p>
+          <p><strong>Price:</strong> ₹${escapeHTML(product.price)} / ${escapeHTML(product.unit)}</p>
+          <p><strong>Organic review:</strong> ${escapeHTML(
+            product.organicDetails?.organicVerificationStatus || "not_submitted"
+          )}</p>
+
+          <div class="actions">
+            <button class="approve"
+              data-action="sale"
+              data-id="${escapeHTML(product._id)}"
+              data-status="approved">Approve Sale</button>
+
+            <button class="reject"
+              data-action="sale"
+              data-id="${escapeHTML(product._id)}"
+              data-status="rejected">Reject Sale</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderAllProducts(products) {
+      const container = document.getElementById("allProducts");
+
+      if (!products.length) {
+        container.innerHTML = '<div class="empty">No products found.</div>';
+        return;
+      }
+
+      container.innerHTML = products.map(product => {
+        const organicStatus =
+          product.organicDetails?.organicVerificationStatus || "not_submitted";
+
+        return `
+          <article class="product">
+            <h3>${escapeHTML(product.emoji || "🌱")} ${escapeHTML(product.name)}</h3>
+            <p><strong>Sale status:</strong> ${escapeHTML(product.verificationStatus)}</p>
+            <p><strong>Organic status:</strong> ${escapeHTML(organicStatus)}</p>
+            <p><strong>Location:</strong> ${escapeHTML(product.location)}</p>
+            <p><strong>Review notes:</strong> ${escapeHTML(
+              product.organicDetails?.adminReviewNotes || "No review notes"
+            )}</p>
+          </article>
+        `;
+      }).join("");
+    }
+
+    loginForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      hideMessage();
+
+      loginButton.disabled = true;
+      loginButton.textContent = "Logging in...";
+
+      try {
+        const data = await api("/api/auth/login", {
+          method: "POST",
+          body: JSON.stringify({
+            email: document.getElementById("email").value.trim(),
+            password: document.getElementById("password").value
+          })
+        });
+
+        if (data.user?.role !== "admin" || !data.token) {
+          throw new Error("This account is not an administrator.");
+        }
+
+        token = data.token;
+        currentUser = data.user;
+
+        localStorage.setItem("agrocartToken", token);
+        localStorage.setItem("agrocartUser", JSON.stringify(currentUser));
+
+        showMessage("Admin login successful.");
+        await loadDashboard();
+      } catch (error) {
+        showMessage(error.message, true);
+      } finally {
+        loginButton.disabled = false;
+        loginButton.textContent = "Log In as Admin";
+      }
+    });
+
+    document.body.addEventListener("click", async event => {
+      const button = event.target.closest("button[data-action]");
+      if (!button || actionInProgress) return;
+
+      const id = button.dataset.id;
+      const status = button.dataset.status;
+      const actionType = button.dataset.action;
+
+      let reviewNotes = "";
+
+      if (actionType === "organic") {
+        const notesField = document.getElementById("notes-" + id);
+        reviewNotes = notesField?.value.trim() || "";
+
+        if (!reviewNotes) {
+          showMessage("Please enter admin review notes before deciding.", true);
+          notesField?.focus();
+          return;
+        }
+
+        if (status === "verified" &&
+            !confirm("Have you reviewed sufficient evidence to verify this organic claim?")) {
+          return;
+        }
+
+        if (status === "rejected" &&
+            !confirm("Reject this organic claim and save your review notes?")) {
+          return;
+        }
+      } else {
+        const action = status === "approved" ? "approve this product for sale" : "reject this product for sale";
+
+        if (!confirm("Are you sure you want to " + action + "?")) {
+          return;
+        }
+      }
+
+      actionInProgress = true;
+      button.disabled = true;
+
+      try {
+        if (actionType === "organic") {
+          await api(`/api/products/${encodeURIComponent(id)}/organic-verification`, {
+            method: "PATCH",
+            body: JSON.stringify({
+              status,
+              reviewNotes
+            })
+          });
+
+          showMessage("Organic claim " + status + " successfully.");
+        } else {
+          await api(`/api/products/${encodeURIComponent(id)}/verification`, {
+            method: "PATCH",
+            body: JSON.stringify({ status })
+          });
+
+          showMessage("Product sale status updated to " + status + ".");
+        }
+
+        await loadDashboard();
+      } catch (error) {
+        showMessage("Action failed: " + error.message, true);
+      } finally {
+        actionInProgress = false;
+      }
+    });
+
+    document.getElementById("logout").addEventListener("click", event => {
+      event.preventDefault();
+
+      token = "";
+      currentUser = null;
+
+      localStorage.removeItem("agrocartToken");
+      localStorage.removeItem("agrocartUser");
+
+      dashboard.hidden = true;
+      loginPanel.hidden = false;
+      loginForm.reset();
+      hideMessage();
+    });
+
+    // Restore an existing admin session, but never trust local role alone.
+    try {
+      const savedUser = JSON.parse(localStorage.getItem("agrocartUser") || "null");
+      const savedToken = localStorage.getItem("agrocartToken");
+
+      if (savedUser?.role === "admin" && savedToken) {
+        token = savedToken;
+        currentUser = savedUser;
+        loadDashboard();
+      } else {
+        loginPanel.hidden = false;
+        dashboard.hidden = true;
+      }
+    } catch {
+      loginPanel.hidden = false;
+      dashboard.hidden = true;
+    }
+  </script>
+</body>
+</html>

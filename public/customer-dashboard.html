@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Dashboard | Organic AgroCart</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f8f1;
+      color: #263b2a;
+    }
+
+    header {
+      background: #205b38;
+      color: white;
+      padding: 20px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    header h2 {
+      margin: 0;
+    }
+
+    a, button {
+      cursor: pointer;
+    }
+
+    .header-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .header-links a,
+    .header-links button {
+      background: white;
+      color: #205b38;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    main {
+      width: min(1050px, 92%);
+      margin: 30px auto;
+    }
+
+    .welcome, .summary, .orders-section {
+      background: white;
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 22px;
+      box-shadow: 0 4px 16px #183b2010;
+    }
+
+    .welcome h1 {
+      margin-top: 0;
+      color: #205b38;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+    }
+
+    .summary-card {
+      padding: 20px;
+      border-radius: 12px;
+      background: #edf6e9;
+    }
+
+    .summary-card p {
+      margin: 0 0 8px;
+      color: #526653;
+    }
+
+    .summary-card strong {
+      font-size: 25px;
+    }
+
+    .order-card {
+      border: 1px solid #dfe9dd;
+      border-radius: 12px;
+      padding: 18px;
+      margin: 15px 0;
+    }
+
+    .order-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .status {
+      background: #fff0c9;
+      color: #805900;
+      padding: 6px 11px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .order-items {
+      background: #f7faf5;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 14px 0;
+    }
+
+    .order-items p {
+      margin: 7px 0;
+    }
+
+    .order-total {
+      font-size: 19px;
+      font-weight: bold;
+      color: #205b38;
+    }
+
+    .muted {
+      color: #69786b;
+      font-size: 14px;
+    }
+
+    .message {
+      padding: 14px;
+      border-radius: 8px;
+      background: #edf6e9;
+    }
+
+    .error {
+      background: #fff0f0;
+      color: #a12727;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 30px 10px;
+    }
+
+    .shop-button {
+      display: inline-block;
+      background: #287543;
+      color: white;
+      text-decoration: none;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-weight: bold;
+      border: none;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #687769;
+    }
+  </style>
+  <link rel="stylesheet" href="/agrocart-theme.css">
+</head>
+
+<body>
+  <header>
+    <h2>🌱 Organic AgroCart</h2>
+
+    <nav class="header-links">
+      <a href="/">Continue Shopping</a>
+      <button id="refresh-orders" type="button">Refresh Orders</button>
+      <button id="logout-button" type="button">Logout</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="welcome">
+      <h1>My Dashboard 👋</h1>
+      <p>Welcome, <strong id="customer-name">Customer</strong>!</p>
+      <p class="muted" id="customer-email"></p>
+      <p>Fresh from the farm, straight to your home.</p>
+    </section>
+
+    <section class="summary">
+      <h2>My Order Summary</h2>
+
+      <div class="summary-grid">
+        <div class="summary-card">
+          <p>Total Orders</p>
+          <strong id="total-orders">—</strong>
+        </div>
+
+        <div class="summary-card">
+          <p>Pending Orders</p>
+          <strong id="pending-orders">—</strong>
+        </div>
+
+        <div class="summary-card">
+          <p>Delivered Orders</p>
+          <strong id="delivered-orders">—</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="orders-section">
+      <h2>📦 My Order History</h2>
+      <p class="muted">
+        View the products you ordered and check their current status.
+      </p>
+
+      <p id="orders-message" class="message" role="status">
+        Loading your orders...
+      </p>
+
+      <div id="orders-list"></div>
+    </section>
+  </main>
+
+  <footer>
+    🌿 Organic AgroCart — Freshness you can trust.
+  </footer>
+
+  <script>
+    const token = localStorage.getItem("agrocartToken");
+
+    let user = null;
+
+    try {
+      user = JSON.parse(
+        localStorage.getItem("agrocartUser") || "null"
+      );
+    } catch {
+      user = null;
+    }
+
+    const message = document.getElementById("orders-message");
+    const ordersList = document.getElementById("orders-list");
+
+    // Escape text before displaying server-provided values in HTML.
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    function money(value) {
+      const amount = Number(value);
+      return "₹" + (Number.isFinite(amount) ? amount : 0).toFixed(2);
+    }
+
+    function formatDate(value) {
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) {
+        return "Date unavailable";
+      }
+
+      return date.toLocaleString("en-IN", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      });
+    }
+
+    function showError(text) {
+      message.textContent = text;
+      message.className = "message error";
+    }
+
+    function checkCustomerLogin() {
+      if (!token || !user || user.role !== "customer") {
+        message.textContent =
+          "Please log in with your customer account to view your orders.";
+
+        message.className = "message error";
+
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1800);
+
+        return false;
+      }
+
+      document.getElementById("customer-name").textContent =
+        user.name || "Customer";
+
+      document.getElementById("customer-email").textContent =
+        user.email || "";
+
+      return true;
+    }
+
+    function renderOrders(orders) {
+      document.getElementById("total-orders").textContent =
+        orders.length;
+
+      document.getElementById("pending-orders").textContent =
+        orders.filter(order =>
+          ["Pending", "Confirmed", "Packed", "Out for Delivery"]
+            .includes(order.status)
+        ).length;
+
+      document.getElementById("delivered-orders").textContent =
+        orders.filter(order => order.status === "Delivered").length;
+
+      if (orders.length === 0) {
+        message.textContent = "You haven't placed any orders yet.";
+        message.className = "message";
+        ordersList.innerHTML = `
+          <div class="empty">
+            <h3>🛒 Your order history is empty</h3>
+            <p>Explore fresh fruits and vegetables from our farmers.</p>
+            <a class="shop-button" href="/">Start Shopping</a>
+          </div>
+        `;
+        return;
+      }
+
+      message.textContent = "Your orders have been loaded.";
+      message.className = "message";
+
+      ordersList.innerHTML = orders.map(order => {
+        const items = Array.isArray(order.items) ? order.items : [];
+        const address = order.deliveryAddress || {};
+
+        const itemHTML = items.map(item => {
+  const organicStatus =
+    item.organicVerificationStatus ||
+    item.organicDetails?.organicVerificationStatus ||
+    "unavailable";
+
+  let badgeText = "Organic status unavailable";
+  let badgeColor = "#687769";
+
+  if (organicStatus === "verified") {
+    badgeText = "✓ Verified Organic";
+    badgeColor = "#20632f";
+  } else if (organicStatus === "pending") {
+    badgeText = "⏳ Organic Verification Pending";
+    badgeColor = "#805900";
+  } else if (organicStatus === "rejected") {
+    badgeText = "Organic Claim Rejected";
+    badgeColor = "#a12727";
+  } else if (organicStatus === "not_submitted") {
+    badgeText = "Organic Claim Not Submitted";
+  }
+
+  return `
+    <div style="padding:10px 0; border-bottom:1px solid #dfe9dd;">
+      <p>
+        <strong>${escapeHTML(item.name || "Product")}</strong>
+        × ${escapeHTML(item.quantity)}
+        — ${money(item.subtotal)}
+      </p>
+
+      <span style="
+        display:inline-block;
+        padding:6px 10px;
+        border-radius:20px;
+        background:#f1f5ee;
+        color:${badgeColor};
+        font-size:13px;
+        font-weight:bold;
+      ">
+        ${escapeHTML(badgeText)}
+      </span>
+    </div>
+  `;
+}).join("");
+
+        return `
+          <article class="order-card">
+            <div class="order-top">
+              <div>
+                <strong>Order #${escapeHTML(
+                  String(order._id || order.id || "").slice(-8)
+                )}</strong>
+                <p class="muted">
+                  Placed on ${escapeHTML(formatDate(order.createdAt))}
+                </p>
+              </div>
+
+              <span class="status">
+                ${escapeHTML(order.status || "Pending")}
+              </span>
+            </div>
+
+            <div class="order-items">
+              ${itemHTML}
+            </div>
+
+            <p class="order-total">
+              Total: ${money(order.totalAmount)}
+            </p>
+
+            <p class="muted">
+              Payment: ${escapeHTML(order.paymentMethod || "Not specified")}
+              · ${escapeHTML(order.paymentStatus || "Pending")}
+            </p>
+
+            <p class="muted">
+              Delivery address:
+              ${escapeHTML(address.addressLine || "")},
+              ${escapeHTML(address.city || "")},
+              ${escapeHTML(address.state || "")}
+              ${escapeHTML(address.pincode || "")}
+            </p>
+          </article>
+        `;
+      }).join("");
+    }
+
+    async function loadOrders() {
+      if (!checkCustomerLogin()) return;
+
+      message.textContent = "Loading your orders...";
+      message.className = "message";
+      ordersList.replaceChildren();
+
+      try {
+        const response = await fetch("/api/orders/mine", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (response.status === 401 || response.status === 403) {
+          showError(
+            "Your session may have expired. Please log in again."
+          );
+          return;
+        }
+
+        if (!response.ok || data.success === false) {
+          throw new Error(data.message || "Could not load your orders.");
+        }
+
+        const orders = Array.isArray(data)
+          ? data
+          : Array.isArray(data.orders)
+            ? data.orders
+            : Array.isArray(data.data)
+              ? data.data
+              : null;
+
+        if (!orders) {
+          throw new Error(
+            "The order API response format was unexpected. Please check routes/orders.js."
+          );
+        }
+
+        renderOrders(orders);
+      } catch (error) {
+        showError(error.message || "Unable to load orders.");
+      }
+    }
+
+    document.getElementById("refresh-orders")
+      .addEventListener("click", loadOrders);
+
+    document.getElementById("logout-button")
+      .addEventListener("click", () => {
+        localStorage.removeItem("agrocartToken");
+        localStorage.removeItem("agrocartUser");
+        window.location.href = "/";
+      });
+
+    loadOrders();
+  </script>
+</body>
+</html>

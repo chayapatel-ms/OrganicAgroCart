@@ -1,0 +1,292 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details | Organic AgroCart</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f8ef;
+      color: #263b2a;
+    }
+
+    header {
+      background: #245c35;
+      color: white;
+      padding: 18px 7%;
+    }
+
+    header a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 35px auto;
+      padding: 20px;
+    }
+
+    .product-card {
+      background: white;
+      padding: 28px;
+      border-radius: 16px;
+      box-shadow: 0 4px 18px #00000010;
+    }
+
+    .product-emoji {
+      font-size: 75px;
+      text-align: center;
+      background: #edf5e8;
+      padding: 25px;
+      border-radius: 12px;
+    }
+
+    h1 {
+      color: #245c35;
+    }
+
+    .price {
+      font-size: 24px;
+      font-weight: bold;
+      color: #287b3e;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 20px;
+      background: #fff0d4;
+      color: #825500;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .verified {
+      background: #dff5df;
+      color: #17652a;
+    }
+
+    .details {
+      margin-top: 25px;
+    }
+
+    .detail-row {
+      padding: 14px 0;
+      border-bottom: 1px solid #e5eadf;
+    }
+
+    .detail-row strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .note {
+      color: #667366;
+      line-height: 1.6;
+    }
+
+    .back-button {
+      display: inline-block;
+      margin-top: 22px;
+      padding: 12px 20px;
+      background: #287b3e;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+    }
+
+    .message {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 15px auto;
+        padding: 12px;
+      }
+
+      .product-card {
+        padding: 18px;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="/agrocart-theme.css">
+</head>
+
+<body>
+  <header>
+    <a href="/">🌱 Organic AgroCart</a>
+  </header>
+
+  <main class="container">
+    <div id="product-container" class="message">
+      Loading product details...
+    </div>
+  </main>
+
+  <script>
+    const container = document.getElementById("product-container");
+
+    function safe(value) {
+      return String(value ?? "Not provided").replace(
+        /[&<>"']/g,
+        character => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        })[character]
+      );
+    }
+
+    function showMessage(message) {
+      container.innerHTML = `
+        <h2>${safe(message)}</h2>
+        <p>Return to the homepage to browse available products.</p>
+        <a class="back-button" href="/">Back to Home</a>
+      `;
+    }
+
+    async function loadProduct() {
+      const productId = new URLSearchParams(
+        window.location.search
+      ).get("id");
+
+      if (!productId) {
+        showMessage("No product selected");
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/products");
+        const result = await response.json();
+
+        const products = result.products || [];
+        const product = products.find(
+          item => String(item._id) === productId
+        );
+
+        if (!response.ok || !product) {
+          showMessage("Product not found");
+          return;
+        }
+
+        const organic = product.organicDetails || {};
+        const status = organic.organicVerificationStatus || "not_submitted";
+        const isVerified = status === "verified";
+
+        container.className = "product-card";
+
+        container.innerHTML = `
+          <div class="product-emoji">${safe(product.emoji || "🥬")}</div>
+
+          <h1>${safe(product.name)}</h1>
+
+          <p class="price">
+            ₹${safe(product.price)} / ${safe(product.unit || "unit")}
+          </p>
+
+          <p>${safe(product.category)}</p>
+
+          <span class="badge ${isVerified ? "verified" : ""}">
+            ${isVerified
+              ? "✓ Organic Claim Verified"
+              : "Organic Verification: " + safe(status.replaceAll("_", " "))}
+          </span>
+
+          <div class="details">
+            <h2>🌿 Farming Information</h2>
+
+            <div class="detail-row">
+              <strong>Farming Method</strong>
+              ${safe(organic.farmingMethod)}
+            </div>
+
+            <div class="detail-row">
+              <strong>Chemical Pesticides Used?</strong>
+              ${safe(organic.chemicalPesticidesUsed)}
+            </div>
+
+            <div class="detail-row">
+              <strong>Pesticide Details</strong>
+              ${safe(organic.pesticideDetails)}
+            </div>
+
+            <div class="detail-row">
+              <strong>Fertilizer Used</strong>
+              ${safe(organic.fertilizerUsed)}
+            </div>
+
+            <div class="detail-row">
+              <strong>Pest Control Method</strong>
+              ${safe(organic.pestControlMethod)}
+            </div>
+
+            <div class="detail-row">
+              <strong>Harvest Date</strong>
+              ${organic.harvestDate
+                ? safe(new Date(organic.harvestDate).toLocaleDateString())
+                : "Not provided"}
+            </div>
+
+            <h2>📜 Certification Information</h2>
+
+            <div class="detail-row">
+              <strong>Certification Provided?</strong>
+              ${organic.certificationProvided ? "Yes" : "No"}
+            </div>
+
+            <div class="detail-row">
+              <strong>Certification Name</strong>
+              ${safe(organic.certificationName)}
+            </div>
+
+            <div class="detail-row">
+              <strong>Certification Number</strong>
+              ${safe(organic.certificationNumber)}
+            </div>
+
+            <div class="detail-row">
+              <strong>Certification Valid Until</strong>
+              ${organic.certificationValidUntil
+                ? safe(new Date(organic.certificationValidUntil).toLocaleDateString())
+                : "Not provided"}
+            </div>
+
+            <div class="detail-row">
+              <strong>Farmer's Notes</strong>
+              ${safe(organic.farmerNotes)}
+            </div>
+
+            <p class="note">
+              Note: Organic verification is separate from product approval.
+              A product marked as verified should have been reviewed by an administrator.
+            </p>
+          </div>
+
+          <a class="back-button" href="/">← Back to Home</a>
+        `;
+      } catch (error) {
+        console.error("Product details error:", error);
+        showMessage("Unable to load product details");
+      }
+    }
+
+    loadProduct();
+  </script>
+</body>
+</html>

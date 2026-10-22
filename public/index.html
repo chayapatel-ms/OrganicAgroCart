@@ -1,0 +1,382 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Discover fresh fruits and vegetables with Organic AgroCart, connecting customers and farmers.">
+  <meta name="theme-color" content="#236b45">
+  <title>Organic AgroCart | Fresh From Farm to Home</title>
+
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/agrocart-theme.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="navbar ag-navbar">
+    <a href="#home" class="logo ag-logo">
+      <span class="ag-logo-icon">🌱</span>
+      <span>Organic <strong>AgroCart</strong></span>
+    </a>
+
+    <nav class="ag-nav" aria-label="Main navigation">
+      <a href="#home">Home</a>
+      <a href="#products">Shop Produce</a>
+      <a href="#about">Our Story</a>
+      <a href="#customer-access">Customer</a>
+      <a href="#farmer-access">Farmer Portal</a>
+    </nav>
+
+    <button class="cart-button ag-cart-button" id="cart-button" type="button">
+      🛒 My Cart <span id="cart-count">0</span>
+    </button>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero ag-hero" id="home">
+      <div class="hero-content ag-hero-content">
+        <span class="eyebrow ag-eyebrow">🌿 GOODNESS GROWN NATURALLY</span>
+
+        <h1>
+          Fresh from the farm.<br>
+          <span>Happy on your table.</span>
+        </h1>
+
+        <p>
+          Discover colourful fruits and vegetables, connect with local farmers,
+          and bring the goodness of the harvest home.
+        </p>
+
+        <div class="ag-hero-actions">
+          <a href="#products" class="button ag-primary-button">
+            Explore Fresh Produce <span aria-hidden="true">→</span>
+          </a>
+          <a href="#about" class="ag-secondary-link">Discover our mission ↗</a>
+        </div>
+
+        <div class="hero-points ag-hero-points">
+          <span>🥬 Farm-fresh selection</span>
+          <span>🤝 Farmer connections</span>
+          <span>🧺 Convenient shopping</span>
+        </div>
+      </div>
+
+      <div class="hero-art ag-hero-art" aria-label="Illustration of fresh produce">
+        <div class="ag-art-orbit ag-orbit-one"></div>
+        <div class="ag-art-orbit ag-orbit-two"></div>
+        <div class="ag-produce-main">🥗</div>
+        <span class="ag-produce-float ag-produce-one">🥑</span>
+        <span class="ag-produce-float ag-produce-two">🍅</span>
+        <span class="ag-produce-float ag-produce-three">🥕</span>
+        <span class="ag-produce-float ag-produce-four">🍊</span>
+        <span class="ag-produce-float ag-produce-five">🥦</span>
+        <div class="ag-harvest-note">
+          <span>🌞</span>
+          <span><strong>Goodness in every basket</strong><small>From growers to your home</small></span>
+        </div>
+      </div>
+      <div class="ag-hero-decoration ag-decoration-one"></div>
+      <div class="ag-hero-decoration ag-decoration-two"></div>
+    </section>
+
+    <!-- Trust indicators -->
+    <section class="trust-strip ag-trust-strip" aria-label="Our values">
+      <div class="ag-trust-item">
+        <span class="ag-trust-icon">🌱</span>
+        <span><strong>Farmer First</strong><small>Celebrate local growers</small></span>
+      </div>
+      <div class="ag-trust-item">
+        <span class="ag-trust-icon">🔎</span>
+        <span><strong>Know Your Produce</strong><small>Transparent product details</small></span>
+      </div>
+      <div class="ag-trust-item">
+        <span class="ag-trust-icon">🍎</span>
+        <span><strong>Fresh Choices</strong><small>Explore fruits and vegetables</small></span>
+      </div>
+      <div class="ag-trust-item">
+        <span class="ag-trust-icon">🧺</span>
+        <span><strong>Easy Shopping</strong><small>Order from home</small></span>
+      </div>
+    </section>
+
+    <!-- Shop -->
+    <section class="shop-section ag-shop-section" id="products">
+      <div class="section-heading ag-section-heading">
+        <div>
+          <span class="eyebrow ag-eyebrow">PICKED FOR YOUR BASKET</span>
+          <h2>Explore the Harvest <span>🍊</span></h2>
+          <p>Find something fresh for your next meal.</p>
+        </div>
+
+        <div class="search-wrap ag-search-wrap">
+          <label for="search-input">Find your favourites</label>
+          <div class="ag-search-box">
+            <span aria-hidden="true">🔍</span>
+            <input id="search-input" type="search"
+              placeholder="Search tomatoes, apples..."
+              autocomplete="off">
+          </div>
+        </div>
+      </div>
+
+      <div class="filters ag-filters" id="category-filters">
+        <button class="filter active" data-category="All" type="button">🌈 All Produce</button>
+        <button class="filter" data-category="Vegetables" type="button">🥦 Vegetables</button>
+        <button class="filter" data-category="Fruits" type="button">🍎 Fruits</button>
+      </div>
+
+      <p class="results-count" id="results-count" aria-live="polite"></p>
+      <div class="product-grid ag-product-grid" id="product-grid"></div>
+
+      <p class="empty-message ag-empty-message" id="empty-message" hidden>
+        🧺 No products found. Try another search or category.
+      </p>
+
+      <div class="ag-shop-note">
+        <span>💚</span>
+        <p><strong>Shop thoughtfully.</strong> Check each product's details and verification status before making your choice.</p>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section class="about-section ag-about-section" id="about">
+      <div class="ag-about-visual" aria-hidden="true">
+        <div class="ag-about-emoji">👩‍🌾</div>
+        <span>🌻</span><span>🍃</span><span>🍅</span>
+      </div>
+
+      <div class="ag-about-copy">
+        <span class="eyebrow ag-eyebrow">OUR LITTLE BIG MISSION</span>
+        <h2>Straight from Soil <span>to Soul.</span> 🌱</h2>
+        <p>
+          Organic AgroCart aims to bring farmers and customers closer together.
+          Explore farm produce, learn about growing practices, and make informed
+          choices for your household.
+        </p>
+        <p class="notice ag-notice">
+          <strong>Our promise of transparency:</strong> This is a student project.
+          Organic or certification claims should only be relied on when their
+          supporting details have been reviewed and verified.
+        </p>
+        <a href="#farmer-access" class="button ag-primary-button">Join as a Farmer →</a>
+      </div>
+    </section>
+
+    <!-- Customer account -->
+    <section class="access-section ag-access-section" id="customer-access">
+      <div class="ag-access-intro">
+        <span class="ag-access-icon">🛍️</span>
+        <span class="eyebrow ag-eyebrow">YOUR FRESH-FOOD JOURNEY</span>
+        <h2>Welcome to your fresh start!</h2>
+        <p>Log in to your account or create one to start shopping.</p>
+        <div class="ag-access-perks">
+          <span>✓ Explore produce</span>
+          <span>✓ Place orders</span>
+          <span>✓ Track your purchases</span>
+        </div>
+      </div>
+
+      <div class="ag-auth-card">
+        <form id="customer-auth-form">
+          <label for="customer-auth-mode">Account option</label>
+          <select id="customer-auth-mode" required>
+            <option value="login">Customer Login</option>
+            <option value="register">New Customer Registration</option>
+          </select>
+
+          <div id="customer-name-field" hidden>
+            <label for="customer-auth-name">Full Name</label>
+            <input id="customer-auth-name" type="text" maxlength="100"
+              autocomplete="name" placeholder="Enter your full name">
+          </div>
+
+          <label for="customer-auth-email">Email Address</label>
+          <input id="customer-auth-email" type="email" required
+            autocomplete="email" placeholder="you@example.com">
+
+          <label for="customer-auth-password">Password</label>
+          <input id="customer-auth-password" type="password" required
+            minlength="8" autocomplete="current-password"
+            placeholder="At least 8 characters">
+
+          <button class="button ag-primary-button" type="submit" id="customer-auth-submit">
+            Log In →
+          </button>
+
+          <p id="customer-auth-message" class="ag-form-message"
+            role="status" aria-live="polite"></p>
+        </form>
+
+        <button class="button ag-secondary-button" id="customer-shop-link"
+          type="button" hidden>Start Shopping ↓</button>
+      </div>
+    </section>
+
+    <!-- Farmer portal -->
+    <section class="access-section ag-farmer-section" id="farmer-access">
+      <div class="ag-access-intro">
+        <span class="ag-access-icon">🌾</span>
+        <span class="eyebrow ag-eyebrow">GROW WITH US</span>
+        <h2>Every farmer has a story.</h2>
+        <p>Bring your harvest online and manage your products through the farmer portal.</p>
+        <div class="ag-access-perks">
+          <span>✓ List your products</span>
+          <span>✓ Manage stock</span>
+          <span>✓ View sales information</span>
+        </div>
+      </div>
+
+      <div class="ag-auth-card">
+        <form id="farmer-auth-form">
+          <label for="farmer-auth-mode">Account option</label>
+          <select id="farmer-auth-mode" required>
+            <option value="login">Farmer Login</option>
+            <option value="register">New Farmer Registration</option>
+          </select>
+
+          <div id="farmer-name-field" hidden>
+            <label for="farmer-auth-name">Full Name</label>
+            <input id="farmer-auth-name" type="text" maxlength="100"
+              autocomplete="name" placeholder="Enter your full name">
+          </div>
+
+          <label for="farmer-auth-email">Email Address</label>
+          <input id="farmer-auth-email" type="email" required
+            autocomplete="email" placeholder="you@example.com">
+
+          <label for="farmer-auth-password">Password</label>
+          <input id="farmer-auth-password" type="password" required
+            minlength="8" autocomplete="current-password"
+            placeholder="At least 8 characters">
+
+          <button class="button ag-primary-button" type="submit" id="farmer-auth-submit">
+            Log In →
+          </button>
+
+          <p id="farmer-auth-message" class="ag-form-message"
+            role="status" aria-live="polite"></p>
+        </form>
+
+        <button class="button ag-secondary-button" id="farmer-dashboard-link"
+          type="button" hidden>Open Farmer Dashboard →</button>
+      </div>
+    </section>
+
+    <!-- Admin access shortcut -->
+    <section class="ag-admin-strip">
+      <span class="ag-admin-icon">🛡️</span>
+      <div>
+        <strong>Administrator access</strong>
+        <p>Manage product reviews and organic verification through the admin portal.</p>
+      </div>
+      <a href="/admin-dashboard.html" class="button ag-admin-button">Admin Dashboard →</a>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="ag-footer">
+    <div class="ag-footer-main">
+      <div>
+        <a href="#home" class="logo ag-logo ag-footer-logo">🌱 Organic AgroCart</a>
+        <p>Fresh produce. Fairer connections. Healthier choices.</p>
+      </div>
+      <div class="ag-footer-links">
+        <a href="#products">Shop Produce</a>
+        <a href="#about">Our Mission</a>
+        <a href="#customer-access">Customer Account</a>
+        <a href="#farmer-access">Farmer Portal</a>
+      </div>
+    </div>
+    <div class="ag-footer-bottom">
+      <small>© <span id="year"></span> Organic AgroCart — Student Project</small>
+      <small>Made with 💚 for farmers and families</small>
+    </div>
+  </footer>
+
+  <!-- Cart overlay -->
+  <div class="overlay" id="overlay" hidden></div>
+
+  <aside class="cart-panel ag-cart-panel" id="cart-panel"
+    role="dialog" aria-modal="true" aria-labelledby="cart-title" hidden>
+    <div class="cart-header ag-cart-header">
+      <div>
+        <span class="eyebrow ag-eyebrow">YOUR HARVEST BASKET</span>
+        <h2 id="cart-title">Your Shopping Cart 🛒</h2>
+      </div>
+      <button id="close-cart" class="close-button" type="button"
+        aria-label="Close cart">✕</button>
+    </div>
+
+    <div id="cart-items" class="cart-items"></div>
+
+    <!-- Checkout form: field IDs and names preserved -->
+    <section id="checkout-form-container" hidden class="ag-checkout-section">
+      <h3>Delivery Details 📦</h3>
+      <p>Where should we deliver your order?</p>
+
+      <form id="checkout-form">
+        <label for="delivery-name">Full Name</label>
+        <input id="delivery-name" name="fullName" type="text"
+          maxlength="100" autocomplete="name" required
+          placeholder="Enter your full name">
+
+        <label for="delivery-phone">Mobile Number</label>
+        <input id="delivery-phone" name="phone" type="tel"
+          inputmode="numeric" pattern="[6-9][0-9]{9}" maxlength="10"
+          autocomplete="tel" required placeholder="10-digit mobile number">
+
+        <label for="delivery-address">Address</label>
+        <textarea id="delivery-address" name="addressLine"
+          maxlength="300" autocomplete="street-address" required
+          placeholder="House number, street, area"></textarea>
+
+        <label for="delivery-city">City</label>
+        <input id="delivery-city" name="city" type="text"
+          maxlength="100" autocomplete="address-level2" required
+          placeholder="Enter your city">
+
+        <label for="delivery-state">State</label>
+        <input id="delivery-state" name="state" type="text"
+          maxlength="100" autocomplete="address-level1" required
+          placeholder="Enter your state">
+
+        <label for="delivery-pincode">PIN Code</label>
+        <input id="delivery-pincode" name="pincode" type="text"
+          inputmode="numeric" pattern="[0-9]{6}" maxlength="6"
+          autocomplete="postal-code" required placeholder="6-digit PIN code">
+
+        <label for="delivery-instructions">Delivery Instructions (Optional)</label>
+        <textarea id="delivery-instructions" name="instructions"
+          maxlength="300" placeholder="Any special delivery instructions?"></textarea>
+
+        <div class="ag-payment-note">
+          <span>💵</span>
+          <span><strong>Cash on Delivery</strong><small>Pay when your order arrives.</small></span>
+        </div>
+
+        <button type="submit" id="place-order-button" class="button ag-primary-button">
+          Place Order →
+        </button>
+        <button type="button" id="cancel-checkout-button" class="button ag-secondary-button">
+          Back to Cart
+        </button>
+
+        <p id="checkout-message" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <div class="cart-footer ag-cart-footer">
+      <p>Subtotal <strong id="cart-subtotal">₹0</strong></p>
+      <small>Delivery charges will be calculated at checkout.</small>
+      <button id="checkout-button" class="button checkout-button ag-primary-button" type="button">
+        Proceed to Checkout →
+      </button>
+      <p id="cart-message" class="cart-message" role="status" aria-live="polite"></p>
+    </div>
+  </aside>
+
+  <script src="/script.js"></script>
+</body>
+</html>
